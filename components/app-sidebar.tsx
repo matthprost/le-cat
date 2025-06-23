@@ -56,8 +56,8 @@ export function AppSidebar() {
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton>
                   <Avatar>
-                    <AvatarImage src="https://avatars.githubusercontent.com/u/7271210?v=4" />
-                    <AvatarFallback>CN</AvatarFallback>
+                    <AvatarImage src="/heisenberg.jpeg" />
+                    <AvatarFallback>WW</AvatarFallback>
                   </Avatar>
                   Heisenberg (Walter. W)
                   <ChevronUp className="ml-auto" />
