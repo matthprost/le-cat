@@ -1,4 +1,6 @@
-import { ChevronUp, MessageCircle } from 'lucide-react'
+'use client'
+
+import { ChevronUp, MessageCircle, PlusIcon } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
@@ -17,34 +19,70 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
+import Link from 'next/link'
+import { useConversations } from '@/providers/conversations-provider'
+import { usePathname, useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import type { MessageOutputEntry } from '@mistralai/mistralai/models/components'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 
-// Menu items.
-const items = [
-  {
-    title: 'Chat',
-    url: '#',
-    icon: MessageCircle,
-  },
-]
+export const AppSidebar = () => {
+  const router = useRouter()
+  const pathname = usePathname()
+  const { conversations } = useConversations()
 
-export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
+          <SidebarGroupLabel className="flex items-center gap-2 justify-between">
+            <div className="flex gap-2 items-center">
+              <MessageCircle size={16} />
+              <span>Chats</span>
+            </div>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  type="button"
+                  onClick={() => router.push('/')}
+                >
+                  <PlusIcon />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>New chat</p>
+              </TooltipContent>
+            </Tooltip>
+          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map(item => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton isActive asChild>
-                    <a href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {conversations.map(conversation => {
+                // For more simplicty we support only string content in the conversation output
+                const conversationOutput = conversation
+                  .entries[0] as MessageOutputEntry
+                const conversationContent =
+                  typeof conversationOutput.content === 'string'
+                    ? conversationOutput.content
+                    : 'Unsupported content type'
+
+                return (
+                  <SidebarMenuItem key={conversation.conversationId}>
+                    <SidebarMenuButton
+                      isActive={pathname.includes(conversation.conversationId)}
+                      asChild
+                    >
+                      <Link href={`/${conversation.conversationId}`}>
+                        <span>{conversationContent}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

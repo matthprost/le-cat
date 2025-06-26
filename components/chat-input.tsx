@@ -1,44 +1,30 @@
 'use client'
 
-import { Mistral } from '@mistralai/mistralai'
-import type {
-  ChatCompletionRequest,
-  ChatCompletionResponse,
-} from '@mistralai/mistralai/models/components'
 import {
   HTTPValidationError,
   SDKValidationError,
 } from '@mistralai/mistralai/models/errors'
-import { ArrowUp, LoaderCircle, RotateCw } from 'lucide-react'
+import { ArrowUp, LoaderCircle } from 'lucide-react'
 import { useState } from 'react'
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
-
-const mistral = new Mistral({
-  apiKey: process.env['NEXT_PUBLIC_MISTRAL_API_KEY'] ?? '',
-})
+import type {
+  ConversationHistory,
+  ConversationResponse,
+} from '@mistralai/mistralai/models/components'
+import { mistral } from '@/utils/mistral'
 
 type FormInput = {
   input: string
 }
 
 type ChatInputProps = {
-  chat: ChatCompletionResponse[]
-  callBack: (data: ChatCompletionResponse) => void
-  reset?: () => void
+  conversationId?: string
+  callBack: (data: ConversationHistory) => void
 }
 
-export const ChatInput = ({
-  chat,
-  callBack,
-  reset: chatReset,
-}: ChatInputProps) => {
+export const ChatInput = ({ conversationId, callBack }: ChatInputProps) => {
   const { reset, register, handleSubmit } = useForm<FormInput>({
     mode: 'onChange',
   })
@@ -49,48 +35,28 @@ export const ChatInput = ({
     setError('')
     setIsLoading(true)
     try {
-      const oldMessages: ChatCompletionRequest['messages'] = chat.map(
-        message => ({
-          role: message.id.includes('user') ? 'user' : 'assistant',
-          content:
-            typeof message.choices[0].message.content === 'string'
-              ? message.choices[0].message.content
-              : 'Unknown data',
-        }),
-      )
+      let result: ConversationResponse
 
-      const result = await mistral.chat.complete({
-        model: 'mistral-small-latest',
-        messages: [
-          ...oldMessages,
-          {
-            role: 'user',
-            content: data.input,
+      if (!conversationId) {
+        result = await mistral.beta.conversations.start({
+          stream: true,
+          model: 'mistral-small-latest',
+          inputs: data.input,
+        })
+      } else {
+        result = await mistral.beta.conversations.append({
+          conversationId: conversationId,
+          conversationAppendRequest: {
+            inputs: data.input,
           },
-        ],
+        })
+      }
+
+      const history = await mistral.beta.conversations.getHistory({
+        conversationId: result.conversationId,
       })
 
-      // to save user input we simulate a first response
-      callBack({
-        id: `user-${Date.now()}`,
-        object: 'chat.completion',
-        created: Date.now(),
-        model: 'mistral-small-latest',
-        choices: [
-          {
-            index: 0,
-            finishReason: 'stop',
-            message: { content: data.input },
-          },
-        ],
-        usage: {
-          promptTokens: data.input.length,
-          completionTokens: 0,
-          totalTokens: data.input.length,
-        },
-      })
-
-      callBack(result)
+      callBack(history)
       reset()
     } catch (error) {
       switch (true) {
@@ -125,23 +91,6 @@ export const ChatInput = ({
               placeholder="Ask Le Cat"
               {...register('input', { required: true })}
             />
-            {!isLoading ? (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    type="button"
-                    disabled={isLoading}
-                    variant="ghost"
-                    onClick={chatReset}
-                  >
-                    <RotateCw />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Reset chat</p>
-                </TooltipContent>
-              </Tooltip>
-            ) : null}
             <Button type="submit" disabled={isLoading}>
               {isLoading ? (
                 <LoaderCircle className="animate-spin" />
