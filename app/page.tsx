@@ -50,7 +50,7 @@ export default function Home() {
 
       <main className="flex flex-col h-full row-start-2 items-center sm:items-start overflow-x-hidden">
         <div
-          className="flex flex-col w-full px-1 md:px-150 py-20 h-full md:gap-6 gap-4 overflow-x-hidden overflow-y-auto"
+          className="flex flex-col w-full px-1 md:px-100 py-20 h-full md:gap-6 gap-4 overflow-x-hidden overflow-y-auto"
           style={{ height: 'calc(100vh - 200px)' }}
           ref={containerRef}
         >

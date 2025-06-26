@@ -116,7 +116,7 @@ export const ChatInput = ({
   }
 
   return (
-    <div className="flex flex-col gap-1 align-center justify-center w-full md:px-200 p-4">
+    <div className="flex flex-col gap-1 align-center justify-center w-full md:px-120 p-4">
       <div className="flex flex-col gap-2 rounded-lg p-2 w-full bg-gray-100">
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="flex gap-2 flex-row w-full">
