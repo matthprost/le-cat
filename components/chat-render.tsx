@@ -19,7 +19,7 @@ export const ChatRender = ({ children, sender }: ChatRenderProps) => {
         </Avatar>
       ) : null}
       <div
-        className={`${sender === 'user' ? 'bg-gray-100 rounded-xl p-3' : ''} max-w-[100%] gap-2 flex flex-col`}
+        className={`${sender === 'user' ? 'bg-gray-100 rounded-xl p-3' : 'animate-in fade-in duration-500'} max-w-[100%] gap-2 flex flex-col`}
       >
         <Markdown
           components={{

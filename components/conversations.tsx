@@ -5,13 +5,14 @@ import type {
   MessageOutputEntry,
 } from '@mistralai/mistralai/models/components'
 import Image from 'next/image'
+import { usePathname, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { ChatInput } from '@/components/chat-input'
 import { ChatRender } from '@/components/chat-render'
 import { SidebarTrigger } from '@/components/ui/sidebar'
-import { usePathname, useRouter } from 'next/navigation'
-import { mistral } from '@/utils/mistral'
 import { useConversations } from '@/providers/conversations-provider'
+import { mistral } from '@/utils/mistral'
+import { LoaderCircle } from 'lucide-react'
 
 type ConversationsProps = {
   conversationId?: string
@@ -24,7 +25,19 @@ export const Conversations = ({ conversationId }: ConversationsProps) => {
   const { conversations, appendConversation } = useConversations()
 
   const [history, setHistory] = useState<ConversationHistory | null>()
+  const [isLoading, setIsLoading] = useState(true)
   const containerRef = useRef<HTMLDivElement | null>(null)
+
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = 'smooth') => {
+    setTimeout(() => {
+      if (containerRef.current) {
+        containerRef.current.scrollTo({
+          top: containerRef.current.scrollHeight,
+          behavior,
+        })
+      }
+    }, 10)
+  }, [])
 
   useEffect(() => {
     if (conversationId) {
@@ -38,10 +51,17 @@ export const Conversations = ({ conversationId }: ConversationsProps) => {
           })
           .then(result => {
             setHistory(result)
+
+            scrollToBottom('instant')
+          })
+          .finally(() => {
+            setIsLoading(false)
           })
       }
+    } else {
+      setIsLoading(false)
     }
-  }, [conversationId, conversations])
+  }, [conversationId, conversations, scrollToBottom])
 
   const callBack = useCallback(
     (newData: ConversationHistory) => {
@@ -52,16 +72,9 @@ export const Conversations = ({ conversationId }: ConversationsProps) => {
         router.push(`/${newData.conversationId}`)
       }
 
-      setTimeout(() => {
-        if (containerRef.current) {
-          containerRef.current.scrollTo({
-            top: containerRef.current.scrollHeight,
-            behavior: 'smooth',
-          })
-        }
-      }, 10)
+      scrollToBottom()
     },
-    [appendConversation, pathname, router],
+    [appendConversation, pathname, router, scrollToBottom],
   )
 
   return (
@@ -76,32 +89,38 @@ export const Conversations = ({ conversationId }: ConversationsProps) => {
           style={{ height: 'calc(100vh - 215px)' }}
           ref={containerRef}
         >
-          {history?.entries?.map(conversation => {
-            // For more simplicty we support only string content in the conversation output
-            const conversationOutput = conversation as MessageOutputEntry
-            const conversationContent =
-              typeof conversationOutput.content === 'string'
-                ? conversationOutput.content
-                : 'Unsupported content type'
+          {isLoading ? (
+            <LoaderCircle className="animate-spin" />
+          ) : (
+            <>
+              {history?.entries?.map(conversation => {
+                // For more simplicty we support only string content in the conversation output
+                const conversationOutput = conversation as MessageOutputEntry
+                const conversationContent =
+                  typeof conversationOutput.content === 'string'
+                    ? conversationOutput.content
+                    : 'Unsupported content type'
 
-            return (
-              <ChatRender
-                key={conversationOutput.id}
-                sender={
-                  conversationOutput.role?.includes('user')
-                    ? 'user'
-                    : 'assistant'
-                }
-              >
-                {conversationContent}
-              </ChatRender>
-            )
-          })}
-          {history === undefined || history?.entries?.length === 0 ? (
-            <ChatRender sender="assistant">
-              Welcome to Le Cat demo! Ask me anything.
-            </ChatRender>
-          ) : null}
+                return (
+                  <ChatRender
+                    key={conversationOutput.id}
+                    sender={
+                      conversationOutput.role?.includes('user')
+                        ? 'user'
+                        : 'assistant'
+                    }
+                  >
+                    {conversationContent}
+                  </ChatRender>
+                )
+              })}
+              {history === undefined || history?.entries?.length === 0 ? (
+                <ChatRender sender="assistant">
+                  Welcome to Le Cat demo! Ask me anything.
+                </ChatRender>
+              ) : null}
+            </>
+          )}
         </div>
         <ChatInput
           conversationId={history?.conversationId}

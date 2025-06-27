@@ -1,5 +1,9 @@
 'use client'
 
+import type {
+  ConversationHistory,
+  ConversationResponse,
+} from '@mistralai/mistralai/models/components'
 import {
   HTTPValidationError,
   SDKValidationError,
@@ -9,10 +13,6 @@ import { useState } from 'react'
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import type {
-  ConversationHistory,
-  ConversationResponse,
-} from '@mistralai/mistralai/models/components'
 import { mistral } from '@/utils/mistral'
 
 type FormInput = {
@@ -39,7 +39,6 @@ export const ChatInput = ({ conversationId, callBack }: ChatInputProps) => {
 
       if (!conversationId) {
         result = await mistral.beta.conversations.start({
-          stream: true,
           model: 'mistral-small-latest',
           inputs: data.input,
         })
@@ -100,7 +99,7 @@ export const ChatInput = ({ conversationId, callBack }: ChatInputProps) => {
             </Button>
           </div>
         </form>
-        {error ? <p className="text-red-600 text-sm px-3">{error}</p> : null}
+        {error ? <p className="text-red-600 text-sm">{error}</p> : null}
       </div>
       <small className="text-gray-600 text-center">
         Le Cat can make mistakes. Please verify the information provided.
