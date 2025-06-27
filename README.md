@@ -23,14 +23,22 @@ Find the deployed version of this application at [https://le-cat.vercel.app/](ht
 - [Shadcn/ui](https://ui.shadcn.com/)
 - [Lucide Icons](https://lucide.dev/)
 
+## Demo
+
+![demo](https://assets-mp.s3.fr-par.scw.cloud/Screen%20Recording%202025-06-27%20at%2015.36.45.gif)
+
 ## Development
 
 Create a `.env` file in the root of your project and add the following environment variables:
 
 ```env
-MISTRAL_API_KEY=your_mistral_api_key
+NEXT_PUBLIC_MISTRAL_API_KEY=your_mistral_api_key
 PASSWORD=your_password
 ```
+
+> [!CAUTION]
+> Do not release this in production or you Mistral API will be compromised.
+> The system has been built for local development only in order to test the Mistral API.
 
 Then install the required dependencies:
 
