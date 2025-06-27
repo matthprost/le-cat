@@ -1,5 +1,6 @@
 'use client'
 
+import { zodResolver } from '@hookform/resolvers/zod'
 import type {
   ConversationHistory,
   ConversationResponse,
@@ -13,7 +14,8 @@ import { useState } from 'react'
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { mistral } from '@/utils/mistral'
+import { mistral } from '@/lib/mistral'
+import { InputSchema } from '@/types/chat-input-schema'
 
 type FormInput = {
   input: string
@@ -25,14 +27,20 @@ type ChatInputProps = {
 }
 
 export const ChatInput = ({ conversationId, callBack }: ChatInputProps) => {
-  const { reset, register, handleSubmit } = useForm<FormInput>({
+  const {
+    reset,
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormInput>({
     mode: 'onChange',
+    resolver: zodResolver(InputSchema),
   })
-  const [error, setError] = useState('')
+  const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
-  const onSubmit: SubmitHandler<FormInput> = async data => {
-    setError('')
+  const onSubmit: SubmitHandler<FormInput> = async (data: FormInput) => {
+    setError(null)
     setIsLoading(true)
     try {
       let result: ConversationResponse
@@ -88,9 +96,9 @@ export const ChatInput = ({ conversationId, callBack }: ChatInputProps) => {
             <Input
               className="bg-transparent border-0 shadow-none focus:ring-0 focus:border-0 focus:shadow-none active:shadow-none"
               placeholder="Ask Le Cat"
-              {...register('input', { required: true })}
+              {...register('input')}
             />
-            <Button type="submit" disabled={isLoading}>
+            <Button type="submit" disabled={isLoading || !!errors.input}>
               {isLoading ? (
                 <LoaderCircle className="animate-spin" />
               ) : (
@@ -99,7 +107,11 @@ export const ChatInput = ({ conversationId, callBack }: ChatInputProps) => {
             </Button>
           </div>
         </form>
-        {error ? <p className="text-red-600 text-sm">{error}</p> : null}
+        {error || errors.input ? (
+          <p className="text-red-600 text-sm">
+            {error ?? errors.input?.message}
+          </p>
+        ) : null}
       </div>
       <small className="text-gray-600 text-center">
         Le Cat can make mistakes. Please verify the information provided.

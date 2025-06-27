@@ -11,7 +11,7 @@ import { ChatInput } from '@/components/chat-input'
 import { ChatRender } from '@/components/chat-render'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { useConversations } from '@/providers/conversations-provider'
-import { mistral } from '@/utils/mistral'
+import { mistral } from '@/lib/mistral'
 import { LoaderCircle } from 'lucide-react'
 
 type ConversationsProps = {
