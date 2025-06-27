@@ -35,6 +35,10 @@ export const AppSidebar = () => {
   const pathname = usePathname()
   const { conversations } = useConversations()
 
+  if (pathname.startsWith('/protected')) {
+    return null
+  }
+
   return (
     <Sidebar>
       <SidebarContent>

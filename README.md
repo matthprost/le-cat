@@ -21,6 +21,7 @@ Find the deployed version of this application at [https://le-cat.vercel.app/](ht
 - [Zod](https://zod.dev/)
 - [Tailwind CSS](https://tailwindcss.com/)
 - [Shadcn/ui](https://ui.shadcn.com/)
+- [Lucide Icons](https://lucide.dev/)
 
 ## Development
 
@@ -28,6 +29,7 @@ Create a `.env` file in the root of your project and add the following environme
 
 ```env
 MISTRAL_API_KEY=your_mistral_api_key
+PASSWORD=your_password
 ```
 
 Then install the required dependencies:

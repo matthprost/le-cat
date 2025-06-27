@@ -1,6 +1,6 @@
 import { z } from 'zod' // Add new import
 
-export const InputSchema = z.object({
+export const ChatFormSchema = z.object({
   input: z
     .string()
     .min(1, 'Please provide at leat one character for Le Cat to work.')

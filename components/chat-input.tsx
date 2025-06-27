@@ -15,7 +15,7 @@ import { type SubmitHandler, useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { mistral } from '@/lib/mistral'
-import { InputSchema } from '@/types/chat-input-schema'
+import { ChatFormSchema } from '@/types/chat-form-schema'
 
 type FormInput = {
   input: string
@@ -34,7 +34,7 @@ export const ChatInput = ({ conversationId, callBack }: ChatInputProps) => {
     formState: { errors },
   } = useForm<FormInput>({
     mode: 'onChange',
-    resolver: zodResolver(InputSchema),
+    resolver: zodResolver(ChatFormSchema),
   })
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
