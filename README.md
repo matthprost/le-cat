@@ -3,6 +3,7 @@
 The goal of the project is to test out Mistal API with a simple web application that allows users to chat with AI.
 
 Find the deployed version of this application at [https://le-cat.vercel.app/](https://le-cat.vercel.app/).
+Password to access the application is `lecat1234`.
 
 ## Features
 
