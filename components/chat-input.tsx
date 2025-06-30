@@ -16,10 +16,9 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { mistral } from '@/lib/mistral'
 import { ChatFormSchema } from '@/types/chat-form-schema'
+import type { z } from 'zod'
 
-type FormInput = {
-  input: string
-}
+type FormInput = z.infer<typeof ChatFormSchema>
 
 type ChatInputProps = {
   conversationId?: string

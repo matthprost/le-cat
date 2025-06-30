@@ -17,10 +17,9 @@ import { LoaderCircle, LockIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState, type ComponentProps } from 'react'
 import { useForm } from 'react-hook-form'
+import type { z } from 'zod'
 
-type FormInput = {
-  password: string
-}
+type FormInput = z.infer<typeof PasswordFormSchema>
 
 export const PasswordForm = ({
   className,
